@@ -10,7 +10,7 @@ import Avatar from "@atomic/Avatar";
 import Card from "@atomic/Card";
 import { MOVIES_URL, REVIEW_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
-import RatingFooter from "@/components/RatingFooter";
+import Rating from "@components/Rating";
 
 
 export default function Movie({id}) {
@@ -53,7 +53,7 @@ function Header({movieId}) {
     <Card header={Header} imageUrl={movie.posterUrl} imageInfo={Yohoho}>
       <div class="flex flex-col h-full">
         <div class="h-full">{movie.description}</div>
-        <RatingFooter kpRating={movie.kpRating} kgRating={movie.averageRating} imdbRating={movie.imdbRating} />
+        <Rating kpRating={movie.kpRating} kgRating={movie.averageRating} imdbRating={movie.imdbRating} />
       </div>
    </Card>
   );

@@ -8,6 +8,7 @@ import Avatar from "@atomic/Avatar";
 import Card from "@atomic/Card";
 import { MOVIES_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
+import Rating from "@components/Rating";
 
 export default function Search({title}) {
   const [response, setResponse] = useState({pages: 0, movies: []});
@@ -43,11 +44,7 @@ function MovieCard(props) {
   );
 
   const RatingTable = (
-    <div class="p-1 mt-2 rounded shadow-sm bg-nord2">
-      <Rating name="kg" rating={props.averageRating} />
-      <Rating name="kp" rating={props.kpRating} />
-      <Rating name="imdb" rating={props.imdbRating} />
-    </div>
+    <Rating row={false} kpRating={props.kpRating} kgRating={props.averageRating} imdbRating={props.imdbRating} />   
   );
 
   return (
@@ -61,14 +58,6 @@ function MovieCard(props) {
           </div>
         </div>
     </Card>
-  );
-}
-
-function Rating({name, rating}) {
-  return (
-    <p class="flex flex-row gap-1 text-sm">
-      {name}: {<ColoredRating rating={rating} />}
-    </p>
   );
 }
 
