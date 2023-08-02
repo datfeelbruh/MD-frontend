@@ -10,6 +10,7 @@ import Avatar from "@atomic/Avatar";
 import Card from "@atomic/Card";
 import { MOVIES_URL, REVIEW_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
+import RatingFooter from "@/components/RatingFooter";
 
 
 export default function Movie({id}) {
@@ -39,17 +40,6 @@ function Header({movieId}) {
       <p class="basis-1/2 ms-1">
         {movie.title} ({movie.releaseYear})
       </p>
-      <div class="flex flex-row gap-3 justify-end my-auto basis-1/2 me-1">
-        <p class="flex flex-row gap-1 text-sm">
-          Киноговно: {<ColoredRating rating={movie.averageRating} />}
-        </p>
-        <p class="flex flex-row gap-1 text-sm">
-          Кинопоиск: {<ColoredRating rating={movie.kpRating} />}
-        </p>
-        <p class="flex flex-row gap-1 text-sm">
-          imdb: {<ColoredRating rating={movie.imdbRating} />}
-        </p>
-      </div>
     </div>
   );
 
@@ -61,8 +51,11 @@ function Header({movieId}) {
 
   return (
     <Card header={Header} imageUrl={movie.posterUrl} imageInfo={Yohoho}>
-      {movie.description}
-    </Card>
+      <div class="flex flex-col h-full">
+        <div class="h-full">{movie.description}</div>
+        <RatingFooter kpRating={movie.kpRating} kgRating={movie.averageRating} imdbRating={movie.imdbRating} />
+      </div>
+   </Card>
   );
 }
 

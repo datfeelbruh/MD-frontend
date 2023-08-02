@@ -29,7 +29,7 @@ export default function Register() {
         <FormInput type="email" placeholder="email" register={register} /><br />
         <FormInput type="password" placeholder="password" register={register} /><br />
         <FormInput type="password" placeholder="password" register={register} registerName="confirmPassword" /><br />
-        <FormButton text="Зарегестрироваться" isLoading={loading} />
+        <FormButton text="Зарегистрироваться" isLoading={loading} />
       </form>
     </Popup>
   );
