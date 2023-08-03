@@ -11,6 +11,7 @@ import Card from "@atomic/Card";
 import { MOVIES_URL, REVIEW_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
 import Rating from "@components/Rating";
+import GenreList from "@/components/GenreList";
 
 
 export default function Movie({id}) {
@@ -52,7 +53,8 @@ function Header({movieId}) {
   return (
     <Card header={Header} imageUrl={movie.posterUrl} imageInfo={Yohoho}>
       <div class="flex flex-col h-full">
-        <div class="h-full">{movie.description}</div>
+        <div class="ps-1">{movie.description}</div>
+        <div class="p-1 h-full"><GenreList genres={movie.genres}/></div>
         <Rating kpRating={movie.kpRating} kgRating={movie.averageRating} imdbRating={movie.imdbRating} />
       </div>
    </Card>

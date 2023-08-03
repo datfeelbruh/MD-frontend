@@ -12,7 +12,7 @@ export default function Rating({kpRating, imdbRating, kgRating, row = true}) {
 
 function RatingInfo({row, symbol, rating, title}) {
   return (
-    <div title={title} className={`flex flex-row justify-start gap-2 mx-1 ${row ? "py-0.5" : ""}`}>
+    <div title={title} className={`flex flex-row justify-start gap-2 mx-1 ${row ? "py-0.5" : ""} hover:cursor-default`}>
       <p class="text-lg">{symbol}</p>
       <ColoredRating rating={rating} className="text-lg" />
     </div>
