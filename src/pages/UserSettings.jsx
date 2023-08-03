@@ -2,7 +2,7 @@ import FormButton from "@atomic/FormButton";
 import { USER_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
 import axios from "axios";
-import { useMemo, useEffect, useState } from "preact/hooks";
+import { useMemo, useState } from "preact/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -13,13 +13,6 @@ export default function UserSettings({ id }) {
     const isTokenExist = token !== null;
     return isTokenExist && JSON.parse(window.atob(token.split(".")[1])).userId == id;
   }, [id]);
-
-  const currentUserSettings = useEffect(() => {
-    if (!isCurrentUserPage) return;
-
-
-
-  }, [id])
 
 
   if (!isCurrentUserPage) return (
@@ -42,6 +35,7 @@ export default function UserSettings({ id }) {
 
   return (
     <div class="flex flex-col gap-2">
+      <AvatarUpdate />
       <AboutUpdate id={id} />
     </div>
   );
@@ -73,6 +67,39 @@ function AboutUpdate({ id }) {
       >
       </textarea>
       <FormButton text="Обновить описание" isLoading={loading} />
+    </form>
+  );
+}
+
+function AvatarUpdate() {
+  const { register, handleSubmit } = useForm();
+  const [loading, setLoading] = useState(false);
+
+  function onSubmit(data) {
+    if (data?.avatar?.[0] === undefined) return;
+    if (data.avatar[0].size < 8192) {
+      toast.error("Слишком большой файл.\nМаксимум 8МБ.");
+      return;
+    }
+
+    const form = new FormData();
+    form.append("image", data.avatar[0]);
+
+    axios.post(USER_URL.UPLOAD_AVATAR, form, { headers: { Authorization: `Bearer ${getToken()}` } })
+      .then(response => {
+        toast.success("Изменено успешно");
+        setLoading(false);
+      })
+      .catch(error => {
+        displayAxiosError(error)
+        setLoading(false);
+      });
+  }
+
+  return (
+    <form class="flex flex-col gap-1" onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <input type="file" accept=".jpeg,.jpg,.png,.gif" {...register("avatar")} />
+      <FormButton text="Обновить аватарку" isLoading={loading} />
     </form>
   );
 }

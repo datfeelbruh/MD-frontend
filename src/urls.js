@@ -17,6 +17,7 @@ export const AUTH_URL = {
 export const USER_URL = {
   REGISTER: `${BASE_URL}/users`,
   CHANGE_ABOUT: (id) => `${BASE_URL}/users/${id}`,
+  UPLOAD_AVATAR: `${BASE_URL}/users/avatar`,
 };
 
 export const REVIEW_URL = {

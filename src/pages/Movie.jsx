@@ -161,13 +161,13 @@ function ReviewList({ userId = null, movieId = null }) {
   );
 }
 
-function Review({ id, userId, username, userReview, className = "bg-nord1" }) {
+function Review({ id, user, userReview, className = "bg-nord1" }) {
   return (
     <div className={`flex flex-col p-2 mb-1 w-full break-words rounded shadow-sm text ${className}`} key={id}>
-      <a class="mb-1 hover:text-nord4" href={`/user/${userId}`}>
+      <a class="mb-1 hover:text-nord4" href={`/user/${user.id}`}>
         <div class="flex flex-row gap-2">
-          <Avatar nickname={username} />
-          <p class="flex flex-row gap-1">{username} (<ColoredRating rating={userReview.rating} />)</p>
+          <Avatar nickname={user.username} src={user.avatar} />
+          <p class="flex flex-row gap-1">{user.username} (<ColoredRating rating={userReview.rating} />)</p>
         </div>
       </a>
       <ReactMarkdown>
