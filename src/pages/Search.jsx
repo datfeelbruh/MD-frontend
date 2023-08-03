@@ -14,7 +14,7 @@ export default function Search({ title }) {
     axios
       .get(`${MOVIES_URL.SEARCH}?title=${title}&expanded=true&findKp=${kp}&page=${page}`, { headers: { "Authorization": `Bearer ${getToken()}` } })
       .then((response) => {
-        if (response?.data?.movies?.length !== 1) {
+        if (response?.data?.movies?.length !== 0) {
           setResponse(response.data);
         } else {
           console.debug("-cash PoroSad");

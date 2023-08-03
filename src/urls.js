@@ -16,6 +16,7 @@ export const AUTH_URL = {
 
 export const USER_URL = {
   REGISTER: `${BASE_URL}/users`,
+  CHANGE_ABOUT: (id) => `${BASE_URL}/users/${id}`,
 };
 
 export const REVIEW_URL = {
@@ -24,3 +25,4 @@ export const REVIEW_URL = {
   SEARCH: `${BASE_URL}/reviews`,
   CREATE: `${BASE_URL}/reviews`,
 };
+
