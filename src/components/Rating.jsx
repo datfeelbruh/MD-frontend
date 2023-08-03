@@ -1,4 +1,4 @@
-import ColoredRating from "./atomic/ColoredRating";
+import ColoredRating from "@atomic/ColoredRating";
 
 export default function Rating({kpRating, imdbRating, kgRating, row = true}) {
   return (

@@ -11,7 +11,7 @@ import Card from "@atomic/Card";
 import { MOVIES_URL, REVIEW_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
 import Rating from "@components/Rating";
-import GenreList from "@/components/GenreList";
+import GenreList from "@components/GenreList";
 
 
 export default function Movie({id}) {
