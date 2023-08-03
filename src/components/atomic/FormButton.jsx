@@ -8,9 +8,9 @@ export default function FormButton({ text, isLoading = false, type = "submit", .
       type={type}
       disabled={isLoading}
     >
-    <div class="flex mx-auto text-nord6">
-      {isLoading && <LoadingSvg size={17} />}{text}
-    </div> 
+      <div class="flex mx-auto text-nord6">
+        {isLoading && <LoadingSvg size={17} />}{text}
+      </div>
     </button>
   );
 }

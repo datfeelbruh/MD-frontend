@@ -6,16 +6,14 @@ import { MOVIES_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
 import MovieSearchCard from "@components/MovieSearchCard";
 
-export default function GenreSearch({genre}) {
-  const [response, setResponse] = useState({pages: 0, movies: []});
+export default function GenreSearch({ genre }) {
+  const [response, setResponse] = useState({ pages: 0, movies: [] });
   const [page, setPage] = useState(1);
 
   function search() {
     axios
       .get(`${MOVIES_URL.BY_GENRE}?genreName=${genre}`, { headers: { "Authorization": `Bearer ${getToken()}` } })
-      .then((response) => {
-          setResponse(response.data);
-      })
+      .then((response) => setResponse(response.data))
       .catch((error) => displayAxiosError(error));
   }
   useEffect(() => search(), [page]);

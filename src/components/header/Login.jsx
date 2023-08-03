@@ -7,8 +7,8 @@ import { displayAxiosError } from "@/utils";
 import FormInput from "@atomic/FormInput";
 import FormButton from "@atomic/FormButton";
 
-export default function Login({setToken}) {
-  const {register, handleSubmit} = useForm();
+export default function Login({ setToken }) {
+  const { register, handleSubmit } = useForm();
   const [loading, setLoading] = useState(false);
 
   function onSubmit(data) {
@@ -20,7 +20,7 @@ export default function Login({setToken}) {
       .catch((error) => displayAxiosError(error))
       .finally(() => setLoading(false));
   }
-  
+
   return (
     <Popup trigger={<button class="me-3 hover:text-nord7">Login</button>} position="bottom left" offsetX={-86} arrow={false}>
       <form class="p-3 mt-3 rounded w-70 bg-nord1" action="/api/users" onSubmit={handleSubmit((data) => onSubmit(data))}>

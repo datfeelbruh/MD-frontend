@@ -1,6 +1,6 @@
 import ColoredRating from "@atomic/ColoredRating";
 
-export default function Rating({kpRating, imdbRating, kgRating, row = true}) {
+export default function Rating({ kpRating, imdbRating, kgRating, row = true }) {
   return (
     <div className={`flex flex-${row ? "row" : "col"} justify-items-center bg-nord2 rounded ${row ? "mx-1" : ""} shadow-sm`}>
       <RatingInfo row={row} symbol="💩" rating={kgRating} title="Киноговно" />
@@ -10,7 +10,7 @@ export default function Rating({kpRating, imdbRating, kgRating, row = true}) {
   );
 }
 
-function RatingInfo({row, symbol, rating, title}) {
+function RatingInfo({ row, symbol, rating, title }) {
   return (
     <div title={title} className={`flex flex-row justify-start gap-2 mx-1 ${row ? "py-0.5" : ""} hover:cursor-default`}>
       <p class="text-lg">{symbol}</p>

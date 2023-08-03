@@ -9,7 +9,7 @@ export default function NotFound() {
       <p>* PAGE_FAULT_IN_NONPAGED_AREA</p><br />
 
       <p>If this is the first time you&aposve seen this stop error screen,echo restart your computer. If this screen appears again, followecho these steps:</p><br />
-      
+
       <p>Check to make sure any new hardware or software is properly installed.</p>
       <p>If this is a new installation, ask your hardware or software manufacturerecho for any Windows updates you might need.</p><br />
 

@@ -9,8 +9,8 @@ import Card from "@atomic/Card";
 import { MOVIES_URL } from "@/urls";
 import { displayAxiosError } from "@/utils";
 
-export default function User({id}) {
-  const [user, setUser] = useState({username: "", movies: [], pages: 1, page: 1});
+export default function User({ id }) {
+  const [user, setUser] = useState({ username: "", movies: [], pages: 1, page: 1 });
 
   useEffect(() => {
     axios
@@ -24,14 +24,14 @@ export default function User({id}) {
   return (
     <div>
       <Header username={user.username} />
-      {user.pages > 1 ? <Paginator page={user.page} maxPage={user.pages} setPage={(page) => setUser({...user, page})} /> : null}
+      {user.pages > 1 ? <Paginator page={user.page} maxPage={user.pages} setPage={(page) => setUser({ ...user, page })} /> : null}
       {user.movies.map(m => <Review {...m} />)}
-      {user.pages > 1 ? <Paginator page={user.page} maxPage={user.pages} setPage={(page) => setUser({...user, page})} /> : null}
+      {user.pages > 1 ? <Paginator page={user.page} maxPage={user.pages} setPage={(page) => setUser({ ...user, page })} /> : null}
     </div>
   );
 }
 
-function Header({username}) {
+function Header({ username }) {
 
   return (
     <div class="flex flex-row p-2 mb-2 rounded shadow-sm bg-nord1">
@@ -48,7 +48,7 @@ function Header({username}) {
   );
 }
 
-function Review({id, title, releaseYear, posterUrl, review, rating, averageRating}) {
+function Review({ id, title, releaseYear, posterUrl, review, rating, averageRating }) {
   const Rating = (
     <p class="flex flex-row">
       <ColoredRating rating={rating} />&#160;|&#160;{<ColoredRating rating={averageRating} />}

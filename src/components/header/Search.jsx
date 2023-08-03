@@ -6,8 +6,8 @@ import { displayAxiosError, getToken } from "@/utils";
 
 export default function Search() {
   const [randomTitle, setRandomTitle] = useState("");
-  const [searchState, setSearchState] = useState({value: "", results: [], searched: false});
-  
+  const [searchState, setSearchState] = useState({ value: "", results: [], searched: false });
+
   useEffect(() => {
     let getRandomTitle = (titles) => titles[Math.floor(Math.random() * titles.length)];
 
@@ -22,10 +22,10 @@ export default function Search() {
 
     axios
       .get(`${MOVIES_URL.SEARCH}?title=${searchState.value}`, { headers: { "Authorization": `Bearer ${getToken()}` } })
-      .then(response => setSearchState({...searchState, results: response.data.movies, searched: true}))
+      .then(response => setSearchState({ ...searchState, results: response.data.movies, searched: true }))
       .catch(error => displayAxiosError(error));
   }
-  
+
   return (
     <div class="m-auto w-auto basis-4/6">
       <input
@@ -33,19 +33,19 @@ export default function Search() {
         type="text"
         placeholder={`Давай посмотрим... ${randomTitle}?`}
         onKeyDown={(e) => e.key == "Enter" && search()}
-        onInput={(e) => setSearchState({...searchState, value: e.target.value})}
-        onFocus={() => searchState.results && setSearchState({...searchState, searched: true})}
+        onInput={(e) => setSearchState({ ...searchState, value: e.target.value })}
+        onFocus={() => searchState.results && setSearchState({ ...searchState, searched: true })}
       />
-      <Popup open={searchState.searched} lockScroll overlayStyle={{display: "block", position: "fixed", top: "48px", backgroundColor: "#0d0d1469"}} onClose={() => setSearchState({...searchState, searched: false})}>
+      <Popup open={searchState.searched} lockScroll overlayStyle={{ display: "block", position: "fixed", top: "48px", backgroundColor: "#0d0d1469" }} onClose={() => setSearchState({ ...searchState, searched: false })}>
         <div class="flex px-1 mx-auto w-4/6">
           <div class="w-full">
             <ul class="shadow-sm">
-              { searchState.results.map(m => <SearchCard {...m} />) }
+              {searchState.results.map(m => <SearchCard {...m} />)}
             </ul>
-            {searchState.value && 
-            <a class="flex justify-center mt-1 w-full rounded shadow-sm bg-nord1 hover:bg-nord3 text-nord6" href={`/search/${searchState.value}`}>
-              Полный поиск
-            </a>}
+            {searchState.value &&
+              <a class="flex justify-center mt-1 w-full rounded shadow-sm bg-nord1 hover:bg-nord3 text-nord6" href={`/search/${searchState.value}`}>
+                Полный поиск
+              </a>}
           </div>
         </div>
       </Popup>

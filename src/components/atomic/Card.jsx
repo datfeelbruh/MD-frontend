@@ -1,4 +1,4 @@
-export default function Card({header = null, imageUrl = null, imageInfo = null, children}) {
+export default function Card({ header = null, imageUrl = null, imageInfo = null, children }) {
   return (
     <div class="flex flex-col mb-1 w-full break-words rounded shadow-sm text bg-nord1">
       {header &&
@@ -7,10 +7,10 @@ export default function Card({header = null, imageUrl = null, imageInfo = null, 
         </div>
       }
       <div class="flex flex-row m-2">
-        { imageUrl &&
+        {imageUrl &&
           <div class="flex flex-col w-2/12 me-2">
             <img class="w-full rounded shadow-sm" src={imageUrl} />
-            { imageInfo && 
+            {imageInfo &&
               <div class="mt-1 h-full">
                 {imageInfo}
               </div>

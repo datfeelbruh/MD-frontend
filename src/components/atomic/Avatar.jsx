@@ -1,7 +1,7 @@
 import Identicon from 'identicon.js';
 import { v5 as uuid } from 'uuid';
 
-export default function Avatar({nickname, src = null, size = 28}) {
+export default function Avatar({ nickname, src = null, size = 28 }) {
   return (
     <img class="rounded" width={size} height={size} src={src === null ? generateRandomAvatar(nickname, size) : src} />
   );

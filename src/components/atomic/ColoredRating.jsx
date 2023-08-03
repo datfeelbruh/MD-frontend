@@ -1,4 +1,4 @@
-export default function ColoredRating({rating, className=""}) {
+export default function ColoredRating({ rating, className = "" }) {
   return (
     <p class={`${className} ${getRatingColor(rating)}`}>{rating}</p>
   );

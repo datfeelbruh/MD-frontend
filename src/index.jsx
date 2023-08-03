@@ -23,7 +23,7 @@ function App() {
     STORAGE.setItem(TOKEN_NAME, token);
     _setToken(token);
   }
-  
+
   let user = token !== null ? JSON.parse(window.atob(token.split(".")[1])) : undefined;
 
   return (

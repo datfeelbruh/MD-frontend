@@ -9,7 +9,7 @@ export default function Home() {
   );
 }
 
-function Link({children}) {
+function Link({ children }) {
   return (
     <a class="hover:underline" href={children}>
       {children}

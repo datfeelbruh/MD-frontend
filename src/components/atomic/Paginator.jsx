@@ -1,4 +1,4 @@
-export default function Paginator({page, setPage, maxPage}) {
+export default function Paginator({ page, setPage, maxPage }) {
   return (
     <div class="flex flex-row mb-2">
       <PaginatorButton onClick={() => setPage(page - 1)} disabled={page === 1}>
@@ -14,7 +14,7 @@ export default function Paginator({page, setPage, maxPage}) {
   );
 }
 
-function PaginatorButton({children, onClick, disabled}) {
+function PaginatorButton({ children, onClick, disabled }) {
   return (
     <button
       className={`rounded ${disabled ? "bg-nord0 text-nord1" : "bg-nord1 hover:bg-nord2"} w-5/12 shadow-sm`}

@@ -6,8 +6,8 @@ import { MOVIES_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
 import MovieSearchCard from "@components/MovieSearchCard";
 
-export default function Search({title}) {
-  const [response, setResponse] = useState({pages: 0, movies: []});
+export default function Search({ title }) {
+  const [response, setResponse] = useState({ pages: 0, movies: [] });
   const [page, setPage] = useState(1);
 
   function search(kp = false) {
