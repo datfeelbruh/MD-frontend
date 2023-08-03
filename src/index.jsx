@@ -11,6 +11,7 @@ import User from '@pages/User';
 import Search from '@pages/Search';
 import NotFound from '@pages/NotFound';
 import Header from '@components/header/Header';
+import GenreSearch from '@pages/GenreSearch';
 
 export const TOKEN_NAME = "token";
 export const STORAGE = localStorage;
@@ -45,6 +46,7 @@ function App() {
             <Route path="/movie/:id" component={Movie} />
             <Route path="/user/:id" component={User} />
             <Route path="/search/:title" component={Search} />
+            <Route path="/genre/:genre" component={GenreSearch} />
             <Route default component={NotFound} />
           </Router>
         </LocationProvider>

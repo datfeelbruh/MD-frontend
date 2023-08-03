@@ -8,7 +8,7 @@ export default function GenreList({genres}) {
 
 function Genre({name}) {
   return (
-    <a class="p-0.5 px-2 rounded bg-nord2 hover:bg-nord3 hover:cursor-default shadow-sm">
+    <a class="p-0.5 px-2 rounded bg-nord2 hover:bg-nord3 hover:cursor-default shadow-sm" href={`/genre/${name}`}>
       {name}
     </a>
   )

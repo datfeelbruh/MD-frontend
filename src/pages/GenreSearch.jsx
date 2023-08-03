@@ -6,20 +6,15 @@ import { MOVIES_URL } from "@/urls";
 import { displayAxiosError, getToken } from "@/utils";
 import MovieSearchCard from "@components/MovieSearchCard";
 
-export default function Search({title}) {
+export default function GenreSearch({genre}) {
   const [response, setResponse] = useState({pages: 0, movies: []});
   const [page, setPage] = useState(1);
 
-  function search(kp = false) {
+  function search() {
     axios
-      .get(`${MOVIES_URL.SEARCH}?title=${title}&expanded=true&findKp=${kp}&page=${page}`, { headers: { "Authorization": `Bearer ${getToken()}` } })
+      .get(`${MOVIES_URL.BY_GENRE}?genreName=${genre}`, { headers: { "Authorization": `Bearer ${getToken()}` } })
       .then((response) => {
-        if (response?.data?.movies?.length !== 1) {
           setResponse(response.data);
-        } else {
-          console.debug("-cash PoroSad");
-          search(true);
-        }
       })
       .catch((error) => displayAxiosError(error));
   }
