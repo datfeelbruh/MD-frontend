@@ -27,3 +27,7 @@ export const REVIEW_URL = {
   CREATE: `${BASE_URL}/reviews`,
 };
 
+export const RESET_PASSWORD_URL = {
+  SEND_MAIL: (email) => `${BASE_URL}/forgotPassword/reset?email=${email}`,
+  RESET: (token) => `${BASE_URL}/forgotPassword/reset?token=${token}`,
+};

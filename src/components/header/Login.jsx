@@ -27,7 +27,7 @@ export default function Login({ setToken }) {
         <FormInput type="text" placeholder="username" register={register} /><br />
         <FormInput type="password" placeholder="password" register={register} /><br />
         <FormButton text="Войти" isLoading={loading} />
-        <a class="flex justify-center w-full mt-1 text-nord6 p-1 bg-nord2 hover:bg-nord3" href="/forgotPassword">Забыл пароль</a>
+        <a class="flex justify-center w-full mt-1 text-nord6 p-1 bg-nord2 hover:bg-nord3" href="/resetPassword">Забыл пароль</a>
       </form>
     </Popup>
   );

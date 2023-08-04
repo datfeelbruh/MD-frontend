@@ -13,6 +13,7 @@ import NotFound from '@pages/NotFound';
 import Header from '@components/header/Header';
 import GenreSearch from '@pages/GenreSearch';
 import UserSettings from '@pages/UserSettings';
+import ResetPassword from '@pages/ResetPassword';
 
 export const TOKEN_NAME = "token";
 export const STORAGE = localStorage;
@@ -49,6 +50,7 @@ function App() {
             <Route path="/userSettings/:id" component={UserSettings} />
             <Route path="/search/:title" component={Search} />
             <Route path="/genre/:genre" component={GenreSearch} />
+            <Route path="/resetPassword" component={ResetPassword} />
             <Route default component={NotFound} />
           </Router>
         </LocationProvider>
