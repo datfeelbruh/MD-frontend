@@ -23,10 +23,11 @@ export default function Login({ setToken }) {
 
   return (
     <Popup trigger={<button class="me-3 hover:text-nord7">Login</button>} position="bottom left" offsetX={-86} arrow={false}>
-      <form class="p-3 mt-3 rounded w-70 bg-nord1" action="/api/users" onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <form class="p-3 mt-3 rounded w-70 bg-nord1" onSubmit={handleSubmit((data) => onSubmit(data))}>
         <FormInput type="text" placeholder="username" register={register} /><br />
         <FormInput type="password" placeholder="password" register={register} /><br />
         <FormButton text="Войти" isLoading={loading} />
+        <a class="flex justify-center w-full mt-1 text-nord6 p-1 bg-nord2 hover:bg-nord3" href="/forgotPassword">Забыл пароль</a>
       </form>
     </Popup>
   );

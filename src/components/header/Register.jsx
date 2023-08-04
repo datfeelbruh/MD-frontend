@@ -24,7 +24,7 @@ export default function Register() {
 
   return (
     <Popup trigger={<button class="me-3 hover:text-nord7">Register</button>} position="bottom left" offsetX={-136} arrow={false}>
-      <form class="p-3 mt-3 rounded w-70 bg-nord1" action="/api/users" onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <form class="p-3 mt-3 rounded w-70 bg-nord1" onSubmit={handleSubmit((data) => onSubmit(data))}>
         <FormInput type="text" placeholder="username" register={register} /><br />
         <FormInput type="email" placeholder="email" register={register} /><br />
         <FormInput type="password" placeholder="password" register={register} /><br />
