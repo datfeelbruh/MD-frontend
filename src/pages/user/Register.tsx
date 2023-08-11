@@ -69,7 +69,7 @@ export default function Register() {
           <button type="submit" class="w-full mt-1 bg-nord2 hover:bg-nord3 rounded p-0.5">
             <div class="flex flex-row justify-center m-auto">
               {loading && <LoadingSvg size={17} />}
-              Войти
+              Зарегистрироваться
             </div>
           </button>
         </form>
