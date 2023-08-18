@@ -5,7 +5,7 @@ export enum ApiRequestType {
   DELETE = "DELETE",
 };
 
-export type Params = {[k: string]: string };
+export type Params = { [k: string]: string };
 
 export default class ApiRequest<B = void> {
   url: string;
