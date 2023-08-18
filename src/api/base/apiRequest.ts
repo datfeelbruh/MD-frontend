@@ -15,7 +15,7 @@ export default class ApiRequest<B = void> {
   params: Params;
   contentType: string;
 
-  constructor(url: string, type: ApiRequestType, body: B = null, params: Params = {}, publicEndpoint: boolean = false, contentType: string = "application/json") {
+  constructor(url: string, type: ApiRequestType, params: Params = {}, body: B = null, publicEndpoint: boolean = false, contentType: string = "application/json") {
     this.url = url;
     this.type = type;
     this.publicEndpoint = publicEndpoint;
@@ -28,6 +28,6 @@ export default class ApiRequest<B = void> {
   toURI() {
     let url = new URL(this.url, window.location.origin);
     Object.entries(this.params)?.forEach(e => url.searchParams.append(e?.[0], e?.[1]));
-    return url;
+    return url.toString();
   }
 }

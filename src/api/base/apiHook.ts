@@ -17,11 +17,11 @@ export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess
         "Content-Type": request.contentType,
         ...(!request.publicEndpoint && { "Authorization": `Bearer ${JSON.parse(localStorage.getItem("token"))?.state?.token}` })
       },
-      ...(request.body !== null && { body: JSON.stringify(request.body) })
+      ...(request.body !== null && request.body !== undefined && { body: JSON.stringify(request.body) })
     })
       .then(data => { setLoading(true); return data; })
-      .then(data => ({ body: data.json(), ok: data.ok }))
-      .then(data => data.ok ? data.body : Promise.reject(new Error(JSON.stringify(data.body))))
+      .then(data => data.json())
+      .then(data => data?.statusCode === undefined ? data : Promise.reject(new Error(JSON.stringify(data))))
       .then(data => { setLoading(false); setResponse({ response: data }); onSuccess?.(data); })
       .catch(error => { setLoading(false); setError(true); setResponse({ fail: error }); onFail?.(error) });
   }
