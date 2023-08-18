@@ -23,7 +23,14 @@ export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess
       .then(data => data.json())
       .then(data => data?.statusCode === undefined ? data : Promise.reject(new Error(JSON.stringify(data))))
       .then(data => { setLoading(false); setResponse({ response: data }); onSuccess?.(data); })
-      .catch(error => { setLoading(false); setError(true); setResponse({ fail: error }); onFail?.(error) });
+      .catch(error => {
+        setLoading(false);
+        setError(true);
+        try { error = JSON.parse(error.message); } catch { };
+        setResponse({ fail: error });
+        onFail?.(error);
+        console.error(error);
+      });
   }
 
   return {
