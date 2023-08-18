@@ -19,7 +19,8 @@ export default class ApiRequest<B = void> {
     this.url = url;
     this.type = type;
     this.publicEndpoint = publicEndpoint;
-    this.body = body;
+    if (type !== ApiRequestType.GET)
+      this.body = body;
     this.params = params;
     this.contentType = contentType;
   }
