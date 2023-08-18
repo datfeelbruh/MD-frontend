@@ -1,35 +1,33 @@
-import { displayError, get } from "@utils/requests";
-import { MOVIES_URL } from "@utils/urls";
+import useMovieSearchRequest from "@api/movie/movieSearchRequest";
+import useRandomTitleRequest from "@api/movie/randomTitleRequest";
 import { useEffect, useState } from "preact/hooks";
+import { toast } from "react-toastify";
 
 export default function Search() {
-  const [randomMovie, setRandomMovie] = useState({id: 0, title: ""});
+  const [randomMovie, setRandomMovie] = useState({ id: 0, title: "" });
   const [searchState, setSearchState] = useState({ value: "", results: [], searched: false });
 
-  useEffect(() => {
-    const pickRandom = movies => movies[Math.floor(Math.random() * movies.length)];
-    get(MOVIES_URL.RANDOM_TITLE, false)
-      .then(data => data.json())
-      .then(data => setRandomMovie(pickRandom(data)))
-      .catch(error => displayError(error));
-  }, [searchState.results]);
+  const { call: callSearch } = useMovieSearchRequest(
+    { title: searchState.value },
+    data => setSearchState({ ...searchState, results: data.movies }),
+    error => toast.error(error.message),
+  );
+
+  const { call: callRandomTitle } = useRandomTitleRequest(
+    data => setRandomMovie(data[Math.floor(Math.random() * data.length)]),
+    error => toast.error(error.message),
+  );
+
+  useEffect(() => callRandomTitle(), [searchState.results]);
 
   useEffect(() => {
-    const delayedSearch = setTimeout(() => search(), 600);
+    const delayedSearch = setTimeout(() => searchState?.value?.length !== undefined && searchState.value.length !== 0 && callSearch(), 600);
     return () => clearTimeout(delayedSearch);
   }, [searchState.value])
 
-  function search() {
-    if (!searchState.value || searchState.value.length === 0) return;
-    get(`${MOVIES_URL.SEARCH}?title=${encodeURI(searchState.value)}`)
-      .then(data => data.json())
-      .then(data => setSearchState({ ...searchState, results: data.movies }))
-      .catch(error => displayError(error));
-  }
-
   function onEnter() {
     if (!searchState.value || searchState.value.length === 0) {
-     window.location.href = `/movie/${randomMovie.id}`; 
+      window.location.href = `/movie/${randomMovie.id}`;
     } else {
       window.location.href = `/search/${encodeURI(searchState.value)}`;
     }
