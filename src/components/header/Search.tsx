@@ -51,9 +51,6 @@ export default function Search() {
               <ul>
                 {searchState.results.map(m => <SearchCard {...m} />)}
               </ul>
-              <a class="flex justify-center mt-1 w-full rounded shadow-sm bg-nord1 hover:bg-nord3" href={`/search/${encodeURI(searchState.value)}`}>
-                Полный поиск
-              </a>
             </div>
           </div>
         </div>
