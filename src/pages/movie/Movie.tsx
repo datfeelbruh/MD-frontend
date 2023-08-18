@@ -103,7 +103,7 @@ function ReviewForm({ id, toggleChanged }: ReviewFormProps) {
       />
       <div class="flex flex-row mb-1">
         <input
-          class="flex justify-center text-center rounded shadow-sm basis-2/12 bg-nord2 hover:bg-nord3 focus:outline-none me-1"
+          class="flex justify-center text-center rounded shadow-sm basis-2/12 bg-nord2 hover:bg-nord3 focus:bg-nord3 focus:outline-none me-1"
           placeholder="Оценка"
           type="number" min="0" max="10" step="0.1" size={3} required
           onInput={(e) => setReview({ ...review, rating: e.target.value })}
