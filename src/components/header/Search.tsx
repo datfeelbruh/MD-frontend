@@ -8,7 +8,7 @@ export default function Search() {
   const [searchState, setSearchState] = useState({ value: "", results: [], searched: false });
 
   const { call: callSearch } = useMovieSearchRequest(
-    { title: searchState.value },
+    { title: searchState.value, page: 1 },
     data => setSearchState({ ...searchState, results: data.movies }),
     error => toast.error(error.message),
   );
