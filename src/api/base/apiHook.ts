@@ -5,7 +5,7 @@ export type onSuccessFn<T> = (res: T) => void;
 export type onFailFn<T> = (res: T) => void;
 
 export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess: onSuccessFn<S> = null, onFail: onFailFn<F> = null) {
-  const [response, setResponse] = useState<{ response?: S, fail?: F } | null>(null);
+  const [response, setResponse] = useState<{ success?: S, fail?: F } | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [isError, setError] = useState<boolean>(false);
 
@@ -21,7 +21,7 @@ export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess
     })
       .then(data => data.json())
       .then(data => data?.statusCode === undefined ? data : Promise.reject(new Error(JSON.stringify(data))))
-      .then(data => { setLoading(false); setResponse({ response: data }); onSuccess?.(data); })
+      .then(data => { setLoading(false); setResponse({ success: data }); onSuccess?.(data); })
       .catch(error => {
         setLoading(false);
         setError(true);
@@ -35,6 +35,7 @@ export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess
   return {
     call,
     response,
+    setResponse,
     isLoading,
     isError
   };
