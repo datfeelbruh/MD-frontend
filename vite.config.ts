@@ -16,6 +16,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:8000",
+      "/swagger-ui": "http://localhost:8000",
+      "/v3/api-docs": "http://localhost:8000",
     }
   }
 });
