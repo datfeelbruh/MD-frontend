@@ -4,9 +4,9 @@ import ApiRequest from "./apiRequest";
 export type onSuccessFn<T> = (res: T) => void;
 export type onFailFn<T> = (res: T) => void;
 
-export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess: onSuccessFn<S> = null, onFail: onFailFn<F> = null) {
+export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess: onSuccessFn<S> = null, onFail: onFailFn<F> = null, defaultLoading: boolean = true) {
   const [response, setResponse] = useState<{ success?: S, fail?: F } | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(true);
+  const [isLoading, setLoading] = useState<boolean>(defaultLoading);
   const [isError, setError] = useState<boolean>(false);
 
   function call() {
