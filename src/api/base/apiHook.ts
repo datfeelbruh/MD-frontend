@@ -6,7 +6,7 @@ export type onFailFn<T> = (res: T) => void;
 
 export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess: onSuccessFn<S> = null, onFail: onFailFn<F> = null) {
   const [response, setResponse] = useState<{ response?: S, fail?: F } | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(true);
   const [isError, setError] = useState<boolean>(false);
 
   function call() {
