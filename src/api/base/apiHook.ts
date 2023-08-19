@@ -20,7 +20,7 @@ export default function useApi<S, F, B = void>(request: ApiRequest<B>, onSuccess
       ...(request.body !== null && request.body !== undefined && { body: JSON.stringify(request.body) })
     })
       .then(data => data.json())
-      .then(data => data?.statusCode === undefined ? data : Promise.reject(new Error(JSON.stringify(data))))
+      .then(data => data?.statusCode === undefined || (data?.statusCode >= 200 && data?.statusCode < 300) ? data : Promise.reject(new Error(JSON.stringify(data))))
       .then(data => { setLoading(false); setResponse({ success: data }); onSuccess?.(data); })
       .catch(error => {
         setLoading(false);
