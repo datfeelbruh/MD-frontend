@@ -25,7 +25,7 @@ function Header() {
 }
 
 function PopularMovies() {
-  const { call, response, isLoading, isError } = usePopularTitleRequest(data => console.log(data), error => toast.error(error.message));
+  const { call, response, isLoading, isError } = usePopularTitleRequest(() => {}, error => toast.error(error.message));
 
   useEffect(() => isLoading && call(), [isLoading]);
 
