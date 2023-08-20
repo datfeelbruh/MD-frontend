@@ -1,9 +1,9 @@
-import LoadingSvg from "@components/atomic/LoadingSpin";
+import useMovieSearchRequest from "@api/movie/movieSearchRequest";
 import NothingFinded from "@components/atomic/NothingFinded";
 import Paginator from "@components/atomic/Paginator";
 import ExpandedMovieCard from "@components/movieCards/ExpandedMovieCard";
-import { displayError, get } from "@utils/requests";
-import { MOVIES_URL } from "@utils/urls";
+import Error from "@pages/Error";
+import Loading from "@pages/Loading";
 import { useEffect, useState } from "preact/hooks"
 
 interface TitleSearchProps {
@@ -11,33 +11,31 @@ interface TitleSearchProps {
 }
 
 export default function TitleSearch({ title }: TitleSearchProps) {
-  const [response, setResponse] = useState({ page: 1, pages: 1, movies: [] });
-  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [findKp, setFindKp] = useState(false);
+  const { call, response, isLoading, isError } = useMovieSearchRequest({ title, page, findKp, expanded: true }, data => {
+    console.debug("request done");
+    if (data?.movies?.length === 0 && !findKp) {
+      setFindKp(true);
+    }
+  });
 
-  function search(kp = false) {
-    if (kp) console.debug("-cash PoroSad");
-
-    get(`${MOVIES_URL.SEARCH}?title=${title}&expanded=true&findKp=${kp}&page=${response.page}`)
-      .then(data => { setLoading(true); return data; })
-      .then(data => data.json())
-      .then(data => {
-        if (data.movies.length === 0 && !kp) search(!kp);
-        else setResponse(data);
-      })
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+  function search() {
+    if (isError) return;
+    if (findKp) console.debug("-cash PoroSad");
+    call();
   }
 
-  useEffect(() => search(), [title, response.page]);
+  useEffect(() => search(), [title, page, findKp]);
 
-  if (loading && response.page === 1) return <LoadingSvg />;
-  if (response.movies.length === 0) return <NothingFinded />;
+  if (isLoading) return <Loading />;
+  if (isError) return <Error message={response.fail.message} />
 
   return (
     <div class="flex flex-col gap-1">
-      {response.pages > 1 ? <Paginator page={response.page} maxPage={response.pages} setPage={page => setResponse({ ...response, page })} /> : null}
-      {response.movies.map(m => <ExpandedMovieCard {...m} />)}
-      {response.pages > 1 ? <Paginator page={response.page} maxPage={response.pages} setPage={page => setResponse({ ...response, page })} /> : null}
+      {response.success.pages > 1 ? <Paginator page={response.success.page} maxPage={response.success.pages} setPage={setPage} /> : null}
+      {response.success.movies.map(m => <ExpandedMovieCard {...m} />)}
+      {response.success.pages > 1 ? <Paginator page={response.success.page} maxPage={response.success.pages} setPage={setPage} /> : null}
     </div>
   );
 }
