@@ -5,7 +5,7 @@ import ExpandedUserCard from "@components/userCards/ExpandedUserCard";
 import Error from "@pages/Error";
 import Loading from "@pages/Loading";
 import { userStore } from "@stores/userStore";
-import { useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { toast } from "react-toastify";
 
 
@@ -15,18 +15,13 @@ interface UserProps {
 
 export default function User({ id }: UserProps) {
   const currentUserId = userStore(state => state?.user?.id);
-
-  const { call, response, setResponse, isLoading, isError } = useUserMoviesRequest(
-    id, { page: 1 }, () => { },
+  const [page, setPage] = useState(1);
+  const { call, response, isLoading, isError } = useUserMoviesRequest(
+    id, { page }, () => { },
     error => toast.error(error.message)
   );
 
-  const setPage = (page) => {
-    response.success.page = page;
-    setResponse({ ...response });
-  };
-
-  useEffect(() => call(), [response?.success?.page, id]);
+  useEffect(() => call(), [page, id]);
 
   if (isLoading) return <Loading />;
   if (isError) return <Error message={response?.fail?.message} />;

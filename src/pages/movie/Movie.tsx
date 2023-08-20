@@ -64,7 +64,7 @@ function ReviewForm({ id, toggleChanged }: ReviewFormProps) {
 
   const { call: deleteReview, isLoading: isDeleteLoading } = useDeleteReviewRequest(
     review?.success?.id,
-    () => { setReview({fail: review.fail, success: null}); toggleChanged(); toast.success("Ревью пользователя успешно удалено") },
+    () => { setReview({ fail: review.fail, success: null }); toggleChanged(); toast.success("Ревью пользователя успешно удалено") },
     error => toast.error(error.message),
   );
 
@@ -79,7 +79,7 @@ function ReviewForm({ id, toggleChanged }: ReviewFormProps) {
     review.success = { ...review.success, rating: value };
     setReview({ ...review });
   }
-  
+
   function onSubmit(event: Event) {
     event.preventDefault();
     switch (((event as SubmitEvent).submitter as HTMLFormElement).name) {
@@ -144,18 +144,14 @@ interface ReviewListProps extends MovieProps {
 }
 
 function ReviewList({ id, changed }: ReviewListProps) {
-  const { call, response, setResponse, isLoading, isError } = useGetReviewsRequest(
-    { page: 1, movieId: id },
+  const [page, setPage] = useState(1);
+  const { call, response, isLoading, isError } = useGetReviewsRequest(
+    { movieId: id, page },
     () => { },
     error => toast.error(error.message),
   );
 
-  const setPage = (page) => {
-    response.success.page = page;
-    setResponse({ ...response })
-  };
-
-  useEffect(() => call(), [response?.success?.page, changed]);
+  useEffect(() => call(), [page, changed]);
 
   if (isLoading) return <Loading />;
   if (isError) return <Error message={response.fail.message} />;
