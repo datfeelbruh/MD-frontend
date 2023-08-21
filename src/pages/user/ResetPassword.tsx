@@ -1,6 +1,5 @@
+import useGetMailRequest, { useResetpasswordRequest } from "@api/auth/resetPasswordRequest";
 import LoadingSvg from "@components/atomic/LoadingSpin";
-import { displayError, get, post } from "@utils/requests";
-import { RESET_PASSWORD_URL } from "@utils/urls";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { toast } from "react-toastify";
 
@@ -36,23 +35,24 @@ interface SendNewPasswordProps {
 
 function SendNewPassword({ token }: SendNewPasswordProps) {
   const [formState, setFormState] = useState({ password: "", confirmPassword: "" });
-  const [loading, setLoading] = useState(false);
+  const { call, isLoading } = useResetpasswordRequest(
+    { token },
+    { password: formState.password },
+    () => window.location.replace(`${window.origin}/login`),
+    error => toast.error(error.message),
+  );
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-    post(RESET_PASSWORD_URL.RESET(token), { password: formState.password }, false)
-      .then(() => setLoading(true))
-      .then(() => (window.location.href = `${window.origin}/login`))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    call();
   }
 
   useEffect(() => {
     const passwordsEquals = formState.password === formState.confirmPassword;
     const message = passwordsEquals ? "" : "Пароли не совпадают";
 
-    document
-      .getElementById("confirm_password")
+    (document
+      .getElementById("confirm_password") as HTMLInputElement)
       .setCustomValidity(message);
   }, [formState.confirmPassword, formState.password])
 
@@ -65,7 +65,7 @@ function SendNewPassword({ token }: SendNewPasswordProps) {
         placeholder="password"
         autocomplete="new-password"
         value={formState.password}
-        onInput={(e) => setFormState({ ...formState, password: e.target.value })}
+        onInput={(e) => setFormState({ ...formState, password: (e.target as HTMLInputElement).value })}
       />
       <input
         class="w-full bg-nord2 hover:bg-nord3 focus:bg-nord3 rounded p-0.5 px-2 outline-none placeholder:text-nord9"
@@ -75,11 +75,11 @@ function SendNewPassword({ token }: SendNewPasswordProps) {
         autocomplete="new-password"
         id="confirm_password"
         value={formState.confirmPassword}
-        onInput={(e) => setFormState({ ...formState, confirmPassword: e.target.value })}
+        onInput={(e) => setFormState({ ...formState, confirmPassword: (e.target as HTMLInputElement).value })}
       />
       <button type="submit" class="w-full mt-1 bg-nord2 hover:bg-nord3 rounded p-0.5">
         <div class="flex flex-row justify-center m-auto">
-          {loading && <LoadingSvg size={17} />}
+          {isLoading && <LoadingSvg size={17} />}
           Сменить пароль
         </div>
       </button>
@@ -89,15 +89,15 @@ function SendNewPassword({ token }: SendNewPasswordProps) {
 
 function SendMail() {
   const [formState, setFormState] = useState({ email: "" });
-  const [loading, setLoading] = useState(false);
+  const { call, isLoading } = useGetMailRequest(
+    formState,
+    () => toast.success("Письмо отправлено"),
+    error => toast.error(error.message),
+  );
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-    get(RESET_PASSWORD_URL.SEND_MAIL(encodeURI(formState.email)), false)
-      .then(() => setLoading(true))
-      .then(() => toast.success("Письмо отправлено"))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    call();
   }
 
   return (
@@ -109,11 +109,11 @@ function SendMail() {
         placeholder="email"
         autocomplete="email"
         value={formState.email}
-        onInput={(e) => setFormState({ ...formState, email: e.target.value })}
+        onInput={(e) => setFormState({ ...formState, email: (e.target as HTMLInputElement).value })}
       />
       <button type="submit" class="w-full mt-1 bg-nord2 hover:bg-nord3 rounded p-0.5">
         <div class="flex flex-row justify-center m-auto">
-          {loading && <LoadingSvg size={17} />}
+          {isLoading && <LoadingSvg size={17} />}
           Отправить Письмо
         </div>
       </button>
