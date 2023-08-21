@@ -1,56 +1,46 @@
-import LoadingSvg from "@components/atomic/LoadingSpin";
+import useLoginRequest from "@api/auth/loginRequest";
+import Form from "@components/atomic/form/Form";
+import FormButton from "@components/atomic/form/FormButton";
+import FormInput from "@components/atomic/form/FormInput";
 import { tokenStore } from "@stores/tokenStore";
-import { displayError, post } from "@utils/requests";
-import { AUTH_URL } from "@utils/urls";
 import { useState } from "preact/hooks";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [formState, setFormState] = useState({ username: "", password: "" });
-  const [loading, setLoading] = useState(false);
   const setToken = tokenStore(state => state.set);
 
-  function onSubmit(event) {
+  const { call, isLoading } = useLoginRequest(
+    formState,
+    data => {
+      window.location.replace(window.origin);
+      setToken(data.accessToken);
+    },
+    error => toast.error(error.message),
+  );
+
+  function onSubmit(event: Event) {
     event.preventDefault();
-    post(AUTH_URL.LOGIN, formState, false)
-      .then(data => { setLoading(true); return data; })
-      .then(data => data.json())
-      .then(data => {
-        window.location.href = window.origin;
-        setToken(data.accessToken);
-      })
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    call();
   }
 
   return (
-    <div class="flex flex-col justify-center">
-      <div class="flex flex-col w-96 m-auto p-2 rounded bg-nord1">
-        <form class="flex flex-col gap-1" onSubmit={onSubmit}>
-          <input
-            class="w-full bg-nord2 hover:bg-nord3 focus:bg-nord3 rounded p-0.5 px-2 outline-none placeholder:text-nord9"
-            type="text"
-            required
-            placeholder="username"
-            autocomplete="username"
-            value={formState.username}
-            onInput={(e) => setFormState({ ...formState, username: e.target.value })}
-          />
-          <input
-            class="w-full bg-nord2 hover:bg-nord3 focus:bg-nord3 rounded p-0.5 px-2 outline-none placeholder:text-nord9"
-            type="password"
-            required
-            placeholder="password"
-            autocomplete="password"
-            value={formState.password}
-            onInput={(e) => setFormState({ ...formState, password: e.target.value })}
-          />
-          <button type="submit" class="w-full mt-1 bg-nord2 hover:bg-nord3 rounded p-0.5">
-            <div class="flex flex-row justify-center m-auto">
-              {loading && <LoadingSvg size={17} />}
-              Войти
-            </div>
-          </button>
-        </form>
+    <div class="flex flex-col justify-center w-96 mx-auto">
+      <Form onSubmit={onSubmit}>
+        <FormInput
+          value={formState.username}
+          onInput={t => setFormState({ ...formState, username: t.value })}
+          placeholder="username" autocomplete
+        />
+        <FormInput
+          value={formState.password}
+          onInput={t => setFormState({ ...formState, password: t.value })}
+          placeholder="password" autocomplete
+        />
+        <FormButton
+          isLoading={isLoading}
+          text="Войти"
+        />
         <div class="flex flex-row gap-2 justify-center">
           <a class="basis-1/2 text-center hover:underline cursor-pointer text-nord4" href="/register">
             Зарегистрироваться
@@ -59,7 +49,7 @@ export default function Login() {
             Забыл пароль
           </a>
         </div>
-      </div>
+      </Form>
     </div>
   );
 }

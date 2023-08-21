@@ -1,11 +1,20 @@
-import LoadingSvg from "@components/atomic/LoadingSpin";
+import useMovieRequest from "@api/movie/movieRequest";
+import useCreateReviewRequest from "@api/review/createReviewRequest";
+import useDeleteReviewRequest from "@api/review/deleteReviewRequest";
+import useGetReviewsRequest, { useGetUserReviewRequest } from "@api/review/getReviewsRequest";
+import useUpdateReviewRequest from "@api/review/updateReviewRequest";
 import Paginator from "@components/atomic/Paginator";
+import Form from "@components/atomic/form/Form";
+import FormButton from "@components/atomic/form/FormButton";
+import FormInput from "@components/atomic/form/FormInput";
+import FormTexarea from "@components/atomic/form/FormTextarea";
 import MovieCard from "@components/movieCards/MovieCard";
 import ReviewCard from "@components/reviewCards/ReviewCard";
+import Error from "@pages/Error";
+import Loading from "@pages/Loading";
 import { userStore } from "@stores/userStore";
-import { delete_, displayError, get, post, put } from "@utils/requests";
-import { MOVIES_URL, REVIEW_URL } from "@utils/urls";
 import { useState, useEffect } from "preact/hooks";
+import { toast } from "react-toastify";
 
 interface MovieProps {
   id: number;
@@ -15,7 +24,7 @@ export default function Movie({ id }: MovieProps) {
   const [changed, setChanged] = useState(false);
 
   return (
-    <div>
+    <div class="flex flex-col">
       <Header id={id} />
       <ReviewForm id={id} toggleChanged={() => setChanged(!changed)} />
       <ReviewList id={id} changed={changed} />
@@ -24,21 +33,14 @@ export default function Movie({ id }: MovieProps) {
 }
 
 function Header({ id }: MovieProps) {
-  const [movie, setMovie] = useState({ id, title: "", releaseYear: 0, averageRating: 0, kpRating: 0, imdbRating: 0, posterUrl: "", description: "", genres: [] });
-  const [loading, setLoading] = useState(false);
+  const { call, response, isLoading, isError } = useMovieRequest(id);
 
-  useEffect(() => {
-    setLoading(true);
-    get(MOVIES_URL.BY_ID(id))
-      .then(data => data.json())
-      .then(data => setMovie(data))
-      .catch(error => displayError(error));
+  useEffect(() => call(), [id])
 
-    setLoading(false);
-  }, [id])
+  if (isLoading) return <Loading />;
+  if (isError) return <Error message={response.fail.message} />
 
-  if (loading) return <LoadingSvg />;
-  return <MovieCard {...movie} />;
+  return <MovieCard {...response.success} />;
 }
 
 interface ReviewFormProps extends MovieProps {
@@ -46,96 +48,93 @@ interface ReviewFormProps extends MovieProps {
 }
 
 function ReviewForm({ id, toggleChanged }: ReviewFormProps) {
-  const [review, setReview] = useState({ movieId: id, id: 0, review: "", rating: undefined });
-  const [loading, setLoading] = useState(false);
-  const user = userStore(state => state.user);
+  const userId = userStore(state => state?.user?.id);
 
-  function responseToReview(response: object) {
-    const responseReview = response?.reviews?.[0] === undefined ? response : response.reviews[0];
-    return { movieId: id, id: responseReview.id, review: responseReview.userReview.review, rating: responseReview.userReview.rating };
+  const { call: getReview, response: review, setResponse: setReview, isLoading: isGetLoading, isError: isGetError } = useGetUserReviewRequest({ movieId: id, userId });
+
+  const { call: createReview, isLoading: isCreateLoading } = useCreateReviewRequest(
+    { movieId: id, review: review?.success?.review, rating: review?.success?.rating },
+    data => { review.success = { ...review.success, ...(data) }; setReview(review); toggleChanged(); toast.success("Ревью пользователя успешно создано"); },
+    error => toast.error(error.message),
+  );
+
+  const { call: updateReview, isLoading: isUpdateLoading } = useUpdateReviewRequest(
+    review?.success?.id,
+    { review: review?.success?.review, rating: review?.success?.rating },
+    () => { setReview({ ...review }); toggleChanged(); toast.success("Ревью пользователя успешно обновлено"); },
+    error => toast.error(error.message),
+  );
+
+  const { call: deleteReview, isLoading: isDeleteLoading } = useDeleteReviewRequest(
+    review?.success?.id,
+    () => { setReview({ fail: review.fail, success: null }); toggleChanged(); toast.success("Ревью пользователя успешно удалено") },
+    error => toast.error(error.message),
+  );
+
+  useEffect(() => getReview(), [id]);
+
+  function updateReviewText(value: string) {
+    review.success = { ...review.success, review: value };
+    setReview({ ...review });
   }
 
-  useEffect(() => {
-    get(`${REVIEW_URL.SEARCH}?movieId=${id}&userId=${user.id}&limit=1`)
-      .then(data => { setLoading(true); return data; })
-      .then(data => data.json())
-      .then(data => data.statusCode === 422 ? Promise.reject() : data)
-      .then(data => setReview(responseToReview(data)))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
-  }, [id]);
+  // can't set it to number, bc parseFloat("N.") => N
+  // idk what to do PoroSad
+  function updateReviewRating(value) {
+    review.success = { ...review.success, rating: value };
+    setReview({ ...review });
+  }
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-    if (event.submitter.name === "create") {
-      post(REVIEW_URL.CREATE, review)
-        .then(data => { setLoading(true); return data; })
-        .then(data => data.json())
-        .then(data => setReview(responseToReview(data)))
-        .catch(error => displayError(error))
-        .then(() => { setLoading(false); toggleChanged() });
-    }
-    if (event.submitter.name === "update") {
-      put(REVIEW_URL.UPDATE(review.id), review)
-        .then(data => { setLoading(true); return data; })
-        .then(data => data.json())
-        .then(data => setReview(responseToReview(data)))
-        .catch(error => displayError(error))
-        .then(() => { setLoading(false); toggleChanged() });
-    }
-    if (event.submitter.name === "delete") {
-      delete_(REVIEW_URL.DELETE(review.id))
-        .then(() => setLoading(true))
-        .then(() => setReview({ movieId: id, id: 0, review: "", rating: "" }))
-        .catch(error => displayError(error))
-        .then(() => { setLoading(false); toggleChanged() });
+    switch (((event as SubmitEvent).submitter as HTMLFormElement).name) {
+      case "create": createReview(); break;
+      case "update": updateReview(); break;
+      case "delete": deleteReview(); break;
     }
   }
+
+  if (isGetLoading) return <Loading />;
+  if (isGetError && review.fail.statusCode !== 422) return <Error message={review.fail.message} />;
 
   return (
-    <form class="flex flex-col" onSubmit={onSubmit}>
-      <textarea
-        class="p-1 px-2 mb-1 rounded shadow-sm resize-none w-70 bg-nord1 hover:bg-nord3 focus:bg-nord3 focus:outline-none"
-        placeholder="Прекрасный фильм, не правда ли?"
-        maxLength={1000} rows={5} required
-        onInput={(e) => setReview({ ...review, review: e.target.value })}
-        value={review?.review}
+    <Form onSubmit={onSubmit}>
+      <FormTexarea
+        value={review?.success?.review ? review.success.review : ""}
+        onInput={t => updateReviewText(t.value)}
+        placeholder="Прекрасный фильм, не правда ли?" maxLength={1000} rows={5}
       />
-      <div class="flex flex-row mb-1">
-        <input
-          class="flex justify-center text-center rounded shadow-sm basis-2/12 bg-nord2 hover:bg-nord3 focus:outline-none me-1"
-          placeholder="Оценка"
-          type="number" min="0" max="10" step="0.1" size={3} required
-          onInput={(e) => setReview({ ...review, rating: e.target.value })}
-          value={review?.rating}
+      <div class="flex flex-row">
+        <FormInput
+          value={review?.success?.rating ? review.success.rating : ""}
+          onInput={t => updateReviewRating(t.value)}
+          placeholder="Оценка" type="number" min={0} max={10} step={0.1} size={3} w="basis-1/12 text-center placeholder-center"
         />
+        <div class="p-0.5" />
         {
-          review?.id ?
+          review?.success?.id !== undefined ?
             <>
-              <button name="update" type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-                <div class="flex flex-row justify-center m-auto">
-                  {loading && <LoadingSvg size={17} />}
-                  Обновить
-                </div>
-              </button>
-              <div class="me-1" />
-              <button name="delete" type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-                <div class="flex flex-row justify-center m-auto">
-                  {loading && <LoadingSvg size={17} />}
-                  Удалить
-                </div>
-              </button>
+              <FormButton
+                isLoading={isUpdateLoading}
+                text="Обновить"
+                name="update"
+              />
+              <div class="px-0.5" />
+              <FormButton
+                isLoading={isDeleteLoading}
+                text="Удалить"
+                name="delete"
+              />
             </>
             :
-            <button name="create" type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-              <div class="flex flex-row justify-center m-auto">
-                {loading && <LoadingSvg size={17} />}
-                Создать
-              </div>
-            </button>
+            <FormButton
+              isLoading={isCreateLoading}
+              text="Создать"
+              name="create"
+            />
         }
       </div>
-    </form>
+    </Form>
   );
 }
 
@@ -144,27 +143,23 @@ interface ReviewListProps extends MovieProps {
 }
 
 function ReviewList({ id, changed }: ReviewListProps) {
-  const [reviews, setReviews] = useState({ page: 1, pages: 1, reviews: [] });
-  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const { call, response, isLoading, isError } = useGetReviewsRequest(
+    { movieId: id, page },
+    () => { },
+    error => toast.error(error.message),
+  );
 
-  function request() {
-    get(`${REVIEW_URL.SEARCH}?movieId=${id}&page=${reviews.page}`)
-      .then(data => { setLoading(true); return data; })
-      .then(data => data.json())
-      .then(data => setReviews(data))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
-  }
+  useEffect(() => call(), [page, changed]);
 
-  useEffect(() => request(), [reviews.page, changed]);
-
-  if (loading) return <LoadingSvg />;
+  if (isLoading) return <Loading />;
+  if (isError) return <Error message={response.fail.message} />;
 
   return (
-    <div>
-      {reviews?.pages > 1 ? <Paginator page={reviews.page} maxPage={reviews.pages} setPage={(page) => setReviews({ ...reviews, page })} /> : null}
-      {reviews.reviews.map(r => <ReviewCard id={r.id} userId={r.user.id} username={r.user.username} avatar={r.user.avatar} userReview={r.userReview} />)}
-      {reviews?.pages > 1 ? <Paginator page={reviews.page} maxPage={reviews.pages} setPage={(page) => setReviews({ ...reviews, page })} /> : null}
+    <div class="mt-1">
+      {response.success.pages > 1 ? <Paginator page={response.success.page} maxPage={response.success.pages} setPage={setPage} /> : null}
+      {response.success.reviews.map(r => <ReviewCard {...r} {...r.user} userId={r.user.id} />)}
+      {response.success.pages > 1 ? <Paginator page={response.success.page} maxPage={response.success.pages} setPage={setPage} /> : null}
     </div>
   );
 }

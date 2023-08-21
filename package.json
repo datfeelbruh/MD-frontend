@@ -19,6 +19,7 @@
 	},
 	"devDependencies": {
 		"@preact/preset-vite": "^2.5.0",
+		"@types/node": "^20.5.1",
 		"autoprefixer": "^10.4.14",
 		"postcss": "^8.4.27",
 		"tailwind-nord": "^1.3.0",

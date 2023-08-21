@@ -46,7 +46,8 @@ export default function ExpandedMovieCard({ id, title, releaseYear, description,
               userId={r.user.id}
               username={r.user.username}
               avatar={r.user.avatar}
-              userReview={{ rating: r.rating, review: trim(r.review) }}
+              rating={r.rating} 
+              review={trim(r.review)}
             />
           )}
         </div>

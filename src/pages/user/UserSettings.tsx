@@ -1,7 +1,11 @@
+import useUpdateAboutRequest from "@api/user/updateAboutRequest";
+import useUpdateAvatarRequest from "@api/user/updateAvatarRequest";
 import LoadingSvg from "@components/atomic/LoadingSpin";
+import Form from "@components/atomic/form/Form";
+import FormButton from "@components/atomic/form/FormButton";
+import FormInput from "@components/atomic/form/FormInput";
+import FormTexarea from "@components/atomic/form/FormTextarea";
 import { userStore } from "@stores/userStore"
-import { displayError, put } from "@utils/requests";
-import { USER_URL } from "@utils/urls";
 import { useEffect, useState } from "preact/hooks";
 import { toast } from "react-toastify";
 
@@ -15,7 +19,7 @@ export default function UserSetting({ id }: UserSettingsProps) {
   if (user.id !== Number(id)) return <Joke />;
 
   return (
-    <div class="flex flex-row gap-2">
+    <div class="flex flex-row gap-2 w-full">
       <AvatarUpdate />
       <UpdateAbout />
     </div>
@@ -24,83 +28,85 @@ export default function UserSetting({ id }: UserSettingsProps) {
 
 function UpdateAbout() {
   const [about, setAbout] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [user, setUser] = userStore(state => [state.user, state.set]);
+  const { call, isLoading } = useUpdateAboutRequest(
+    user.id,
+    { about },
+    data => setUser(data),
+    error => toast.error(error.message),
+  );
 
   useEffect(() => setAbout(user.about), []);
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-
-    put(USER_URL.CHANGE_ABOUT(user.id), about)
-      .then(data => { setLoading(true); return data; })
-      .then(data => data.json())
-      .then(data => setUser(data))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    call();
   }
 
   return (
-    <form class="flex flex-col gap-1 w-4/6" onSubmit={onSubmit}>
-      <textarea
-        class="rounded bg-nord1 hover:bg-nord2 focus:bg-nord2 focus:outline-none resize-none p-1 px-2"
-        placeholder="Вы не поверите, товарищ следователь..."
-        maxLength={1000} rows={5}
-        onInput={e => setAbout(e.target.value)}
-        value={about}
-      >
-      </textarea>
-      <button type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-        <div class="flex flex-row justify-center m-auto">
-          {loading && <LoadingSvg size={17} />}
-          Обновить описание
-        </div>
-      </button>
-    </form>
+    <div class="w-4/6">
+      <Form onSubmit={onSubmit}>
+        <FormTexarea
+          value={about}
+          onInput={t => setAbout(t.value)}
+          placeholder="Вы не поверите, товарищ следователь..." maxLength={1000} rows={5}
+        />
+        <FormButton
+          isLoading={isLoading}
+          text="Обновить описание"
+        />
+      </Form>
+    </div>
   );
 }
 
 function AvatarUpdate() {
-  const [avatar, setAvatar] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(() => new FormData());
   const [user, setUser] = userStore(state => [state.user, state.set]);
+  const { call, isLoading } = useUpdateAvatarRequest(
+    formData,
+    // reload bc url doesn't change if avatar already exists
+    data => { setUser({ ...data }); window.location.reload(); },
+    error => toast.error(error.message),
+  );
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-    if (avatar === null) return;
-    if (avatar.size > 8000000) { toast.error("Слишком большой файл.\nМаксимум 8МБ."); return; }
 
-    const formData = new FormData();
-    formData.append("image", avatar);
-    
-    fetch(USER_URL.UPLOAD_AVATAR, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("token"))?.state?.token}`,
-      },
-      body: formData,
-    })
-      .then(data => { setLoading(true); return data; })
-      .then(data => data.json())
-      .then(data => setUser(data))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    if (formData.get("image") === null) return;
+    if ((formData.get("image") as Blob).size > 8000000) { toast.error("Слишком большой файл.\nМаксимум 8МБ."); return; }
+
+    call();
   }
 
   return (
-    <form class="flex flex-col gap-1 w-2/6" onSubmit={onSubmit}>
-      <img class="h-auto" height={96} src={avatar === null ? user.avatar : URL.createObjectURL(avatar)} placeholder="Аватар" alt="Аватар" />
-
-      <input type="file" accept=".jpeg,.jpg,.png,.gif" onInput={e => setAvatar(e?.target?.files?.[0])} />
-      
-      <button type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-        <div class="flex flex-row justify-center m-auto">
-          {loading && <LoadingSvg size={17} />}
-          Обновить аватар
-        </div>
-      </button>
-    </form>
+    <div class="w-2/6">
+      <Form onSubmit={onSubmit}>
+        <img
+          id="avatar_preview"
+          class="h-auto rounded"
+          height={96}
+          src={user.avatar}
+          placeholder="Аватар"
+          alt="Аватар"
+        />
+        <FormInput
+          type="file"
+          accept=".jpeg,.jpg,.png,.gif"
+          onInput={
+            t => {
+              (document.getElementById("avatar_preview") as HTMLImageElement).src = URL.createObjectURL(t.files[0]);
+              formData.set("image", t.files[0]);
+              setFormData(formData);
+            }
+          }
+        />
+        <FormButton
+          isLoading={isLoading}
+          text="Обновить аватар"
+        />
+      </Form>
+    </div>
   );
 }
 
