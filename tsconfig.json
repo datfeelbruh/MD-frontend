@@ -9,7 +9,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "types": [
-      "vite/client"
+      "vite/client",
+      "node",
     ],
     "paths": {
       "@components/*": ["./src/components/*"],
