@@ -40,7 +40,7 @@ export default function Search() {
         type="text"
         placeholder={`Давай посмотрим... ${randomMovie.title}?`}
         value={searchState.value}
-        onInput={(e) => setSearchState({ ...searchState, value: e.target.value })}
+        onInput={(e) => setSearchState({ ...searchState, value: (e.target as HTMLInputElement).value })}
         onFocus={() => setSearchState({ ...searchState, searched: true })}
         onKeyDown={(e) => e.key == "Enter" && onEnter()}
       />
