@@ -1,5 +1,4 @@
-// https://github.com/preactjs/preact/issues/3934
-interface InputProps extends React.Component<React.HTMLAttributes<HTMLInputElement>> {
+interface InputProps extends React.ComponentProps<any> {
   value?: string | number | undefined;
   onInput: (target: HTMLInputElement) => void;
   autocomplete?: string | true | undefined;
