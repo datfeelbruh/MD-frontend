@@ -15,14 +15,15 @@ export default class ApiRequest<B = void> {
   params: Params;
   contentType: string;
 
-  constructor(url: string, type: ApiRequestType, params: Params = {}, body: B = null, publicEndpoint: boolean = false, contentType: string = "application/json") {
+  constructor(url: string, type: ApiRequestType, params: Params = {}, body: B = null, publicEndpoint: boolean = false, contentType: string | null = "application/json") {
     this.url = url;
     this.type = type;
     this.publicEndpoint = publicEndpoint;
     if (type !== ApiRequestType.GET)
       this.body = body;
     this.params = params;
-    this.contentType = contentType;
+    if (contentType !== null)
+      this.contentType = contentType;
   }
 
   toURI() {
