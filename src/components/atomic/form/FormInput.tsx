@@ -16,6 +16,7 @@ export default function FormInput({ onInput, value = undefined, autocomplete = t
       onInput={e => onInput(e.target as HTMLInputElement)}
       autoComplete={autocomplete === true ? placeholder : autocomplete as string | undefined}
       type={type}
+      required
     />
   );
 }
