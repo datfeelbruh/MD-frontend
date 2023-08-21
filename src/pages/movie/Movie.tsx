@@ -3,8 +3,11 @@ import useCreateReviewRequest from "@api/review/createReviewRequest";
 import useDeleteReviewRequest from "@api/review/deleteReviewRequest";
 import useGetReviewsRequest, { useGetUserReviewRequest } from "@api/review/getReviewsRequest";
 import useUpdateReviewRequest from "@api/review/updateReviewRequest";
-import LoadingSvg from "@components/atomic/LoadingSpin";
 import Paginator from "@components/atomic/Paginator";
+import Form from "@components/atomic/form/Form";
+import FormButton from "@components/atomic/form/FormButton";
+import FormInput from "@components/atomic/form/FormInput";
+import FormTexarea from "@components/atomic/form/FormTextarea";
 import MovieCard from "@components/movieCards/MovieCard";
 import ReviewCard from "@components/reviewCards/ReviewCard";
 import Error from "@pages/Error";
@@ -75,7 +78,9 @@ function ReviewForm({ id, toggleChanged }: ReviewFormProps) {
     setReview({ ...review });
   }
 
-  function updateReviewRating(value: number) {
+  // can't set it to number, bc parseFloat("N.") => N
+  // idk what to do PoroSad
+  function updateReviewRating(value) {
     review.success = { ...review.success, rating: value };
     setReview({ ...review });
   }
@@ -93,49 +98,43 @@ function ReviewForm({ id, toggleChanged }: ReviewFormProps) {
   if (isGetError && review.fail.statusCode !== 422) return <Error message={review.fail.message} />;
 
   return (
-    <form class="flex flex-col" onSubmit={onSubmit}>
-      <textarea
-        class="p-1 px-2 mb-1 rounded shadow-sm resize-none w-70 bg-nord1 hover:bg-nord3 focus:bg-nord3 focus:outline-none"
-        placeholder="Прекрасный фильм, не правда ли?"
-        maxLength={1000} rows={5} required
-        onInput={e => updateReviewText((e.target as HTMLTextAreaElement).value)}
-        value={review.success?.review ? review.success.review : ""}
+    <Form onSubmit={onSubmit}>
+      <FormTexarea
+        value={review?.success?.review ? review.success.review : ""}
+        onInput={t => updateReviewText(t.value)}
+        placeholder="Прекрасный фильм, не правда ли?" maxLength={1000} rows={5}
       />
-      <div class="flex flex-row mb-1">
-        <input
-          class="flex justify-center text-center rounded shadow-sm basis-2/12 bg-nord2 hover:bg-nord3 focus:bg-nord3 focus:outline-none me-1"
-          placeholder="Оценка"
-          type="number" min="0" max="10" step="0.1" size={3} required
-          onInput={(e) => updateReviewRating(Number((e.target as HTMLInputElement).value))}
-          value={review.success?.rating ? review.success.rating : ""}
+      <div class="flex flex-row">
+        <FormInput
+          value={review?.success?.rating ? review.success.rating : ""}
+          onInput={t => updateReviewRating(t.value)}
+          placeholder="Оценка" type="number" min={0} max={10} step={0.1} size={3} w="basis-1/12 text-center placeholder-center"
         />
+        <div class="p-0.5" />
         {
           review?.success?.id !== undefined ?
             <>
-              <button name="update" type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-                <div class="flex flex-row justify-center m-auto">
-                  {isUpdateLoading && <LoadingSvg size={17} />}
-                  Обновить
-                </div>
-              </button>
-              <div class="me-1" />
-              <button name="delete" type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-                <div class="flex flex-row justify-center m-auto">
-                  {isDeleteLoading && <LoadingSvg size={17} />}
-                  Удалить
-                </div>
-              </button>
+              <FormButton
+                isLoading={isUpdateLoading}
+                text="Обновить"
+                name="update"
+              />
+              <div class="px-0.5" />
+              <FormButton
+                isLoading={isDeleteLoading}
+                text="Удалить"
+                name="delete"
+              />
             </>
             :
-            <button name="create" type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-              <div class="flex flex-row justify-center m-auto">
-                {isCreateLoading && <LoadingSvg size={17} />}
-                Создать
-              </div>
-            </button>
+            <FormButton
+              isLoading={isCreateLoading}
+              text="Создать"
+              name="create"
+            />
         }
       </div>
-    </form>
+    </Form>
   );
 }
 
@@ -157,7 +156,7 @@ function ReviewList({ id, changed }: ReviewListProps) {
   if (isError) return <Error message={response.fail.message} />;
 
   return (
-    <div>
+    <div class="mt-1">
       {response.success.pages > 1 ? <Paginator page={response.success.page} maxPage={response.success.pages} setPage={setPage} /> : null}
       {response.success.reviews.map(r => <ReviewCard {...r} {...r.user} userId={r.user.id} />)}
       {response.success.pages > 1 ? <Paginator page={response.success.page} maxPage={response.success.pages} setPage={setPage} /> : null}

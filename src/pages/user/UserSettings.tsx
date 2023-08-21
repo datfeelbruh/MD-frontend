@@ -1,6 +1,10 @@
 import useUpdateAboutRequest from "@api/user/updateAboutRequest";
 import useUpdateAvatarRequest from "@api/user/updateAvatarRequest";
 import LoadingSvg from "@components/atomic/LoadingSpin";
+import Form from "@components/atomic/form/Form";
+import FormButton from "@components/atomic/form/FormButton";
+import FormInput from "@components/atomic/form/FormInput";
+import FormTexarea from "@components/atomic/form/FormTextarea";
 import { userStore } from "@stores/userStore"
 import { useEffect, useState } from "preact/hooks";
 import { toast } from "react-toastify";
@@ -15,7 +19,7 @@ export default function UserSetting({ id }: UserSettingsProps) {
   if (user.id !== Number(id)) return <Joke />;
 
   return (
-    <div class="flex flex-row gap-2">
+    <div class="flex flex-row gap-2 w-full">
       <AvatarUpdate />
       <UpdateAbout />
     </div>
@@ -40,22 +44,19 @@ function UpdateAbout() {
   }
 
   return (
-    <form class="flex flex-col gap-1 w-4/6" onSubmit={onSubmit}>
-      <textarea
-        class="rounded bg-nord1 hover:bg-nord2 focus:bg-nord2 focus:outline-none resize-none p-1 px-2"
-        placeholder="Вы не поверите, товарищ следователь..."
-        maxLength={1000} rows={5}
-        onInput={e => setAbout((e.target as HTMLInputElement).value)}
-        value={about}
-      >
-      </textarea>
-      <button type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-        <div class="flex flex-row justify-center m-auto">
-          {isLoading && <LoadingSvg size={17} />}
-          Обновить описание
-        </div>
-      </button>
-    </form>
+    <div class="w-4/6">
+      <Form onSubmit={onSubmit}>
+        <FormTexarea
+          value={about}
+          onInput={t => setAbout(t.value)}
+          placeholder="Вы не поверите, товарищ следователь..." maxLength={1000} rows={5}
+        />
+        <FormButton
+          isLoading={isLoading}
+          text="Обновить описание"
+        />
+      </Form>
+    </div>
   );
 }
 
@@ -79,33 +80,33 @@ function AvatarUpdate() {
   }
 
   return (
-    <form class="flex flex-col gap-1 w-2/6" onSubmit={onSubmit}>
-      <img
-        id="avatar_preview"
-        class="h-auto"
-        height={96}
-        src={user.avatar}
-        placeholder="Аватар"
-        alt="Аватар"
-      />
-      <input
-        type="file"
-        accept=".jpeg,.jpg,.png,.gif"
-        onInput={
-          e => {
-            (document.getElementById("avatar_preview") as HTMLImageElement).src = URL.createObjectURL((e.target as HTMLInputElement).files[0]);
-            formData.set("image", (e.target as HTMLInputElement).files[0]);
-            setFormData(formData);
+    <div class="w-2/6">
+      <Form onSubmit={onSubmit}>
+        <img
+          id="avatar_preview"
+          class="h-auto rounded"
+          height={96}
+          src={user.avatar}
+          placeholder="Аватар"
+          alt="Аватар"
+        />
+        <FormInput
+          type="file"
+          accept=".jpeg,.jpg,.png,.gif"
+          onInput={
+            t => {
+              (document.getElementById("avatar_preview") as HTMLImageElement).src = URL.createObjectURL(t.files[0]);
+              formData.set("image", t.files[0]);
+              setFormData(formData);
+            }
           }
-        }
-      />
-      <button type="submit" class="w-full bg-nord2 hover:bg-nord3 rounded p-1">
-        <div class="flex flex-row justify-center m-auto">
-          {isLoading && <LoadingSvg size={17} />}
-          Обновить аватар
-        </div>
-      </button>
-    </form>
+        />
+        <FormButton
+          isLoading={isLoading}
+          text="Обновить аватар"
+        />
+      </Form>
+    </div>
   );
 }
 
