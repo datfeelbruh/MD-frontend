@@ -10,11 +10,14 @@ export default defineConfig({
       "@pages": path.resolve(__dirname, "./src/pages"),
       "@stores": path.resolve(__dirname, "./src/stores"),
       "@utils": path.resolve(__dirname, "./src/utils"),
+      "@api": path.resolve(__dirname, "./src/api"),
     }
   },
   server: {
     proxy: {
       "/api": "http://localhost:8000",
+      "/swagger-ui": "http://localhost:8000",
+      "/v3/api-docs": "http://localhost:8000",
     }
   }
 });

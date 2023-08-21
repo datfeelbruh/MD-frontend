@@ -25,7 +25,7 @@ interface GenreProps extends Genre {
 
 function Genre({ name, id }: GenreProps) {
   return (
-    <a class="p-0.5 px-2 rounded bg-nord2 hover:bg-nord3 hover:cursor-default shadow-sm" href={`/genre/${name}`} key={id}>
+    <a class="p-0.5 pb-1 px-2 rounded bg-nord2 hover:bg-nord3 hover:cursor-default shadow-sm" href={`/genre/${name}`} key={id}>
       {name}
     </a>
   );

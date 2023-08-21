@@ -1,6 +1,7 @@
-import LoadingSvg from "@components/atomic/LoadingSpin";
-import { displayError, get, post } from "@utils/requests";
-import { RESET_PASSWORD_URL } from "@utils/urls";
+import useGetMailRequest, { useResetpasswordRequest } from "@api/auth/resetPasswordRequest";
+import Form from "@components/atomic/form/Form";
+import FormButton from "@components/atomic/form/FormButton";
+import FormInput from "@components/atomic/form/FormInput";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { toast } from "react-toastify";
 
@@ -19,13 +20,11 @@ export default function ResetPassword() {
   }, [params]);
 
   return (
-    <div class="flex flex-col justify-center">
-      <div class="flex flex-col w-96 m-auto p-2 rounded bg-nord1">
-        {token !== undefined ?
-          <SendNewPassword token={token} /> :
-          <SendMail />
-        }
-      </div>
+    <div class="flex flex-col justify-center w-96 mx-auto rounded bg-nord1">
+      {token !== undefined ?
+        <SendNewPassword token={token} /> :
+        <SendMail />
+      }
     </div>
   );
 }
@@ -36,87 +35,71 @@ interface SendNewPasswordProps {
 
 function SendNewPassword({ token }: SendNewPasswordProps) {
   const [formState, setFormState] = useState({ password: "", confirmPassword: "" });
-  const [loading, setLoading] = useState(false);
+  const { call, isLoading } = useResetpasswordRequest(
+    { token },
+    { password: formState.password },
+    () => window.location.replace(`${window.origin}/login`),
+    error => toast.error(error.message),
+  );
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-    post(RESET_PASSWORD_URL.RESET(token), { password: formState.password }, false)
-      .then(() => setLoading(true))
-      .then(() => (window.location.href = `${window.origin}/login`))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    call();
   }
 
   useEffect(() => {
     const passwordsEquals = formState.password === formState.confirmPassword;
     const message = passwordsEquals ? "" : "Пароли не совпадают";
 
-    document
-      .getElementById("confirm_password")
+    (document
+      .getElementById("confirm_password") as HTMLInputElement)
       .setCustomValidity(message);
   }, [formState.confirmPassword, formState.password])
 
   return (
-    <form class="flex flex-col gap-1" onSubmit={onSubmit}>
-      <input
-        class="w-full bg-nord2 hover:bg-nord3 focus:bg-nord3 rounded p-0.5 px-2 outline-none placeholder:text-nord9"
-        type="password"
-        required
-        placeholder="password"
-        autocomplete="new-password"
+    <Form onSubmit={onSubmit}>
+      <FormInput
         value={formState.password}
-        onInput={(e) => setFormState({ ...formState, password: e.target.value })}
+        onInput={t => setFormState({ ...formState, password: t.value })}
+        placeholder="password" autocomplete="new-password" type="password"
       />
-      <input
-        class="w-full bg-nord2 hover:bg-nord3 focus:bg-nord3 rounded p-0.5 px-2 outline-none placeholder:text-nord9"
-        type="password"
-        required
-        placeholder="confim password"
-        autocomplete="new-password"
-        id="confirm_password"
+      <FormInput
         value={formState.confirmPassword}
-        onInput={(e) => setFormState({ ...formState, confirmPassword: e.target.value })}
+        onInput={t => setFormState({ ...formState, confirmPassword: t.value })}
+        placeholder="confirm password" autocomplete="new-password" type="password"
       />
-      <button type="submit" class="w-full mt-1 bg-nord2 hover:bg-nord3 rounded p-0.5">
-        <div class="flex flex-row justify-center m-auto">
-          {loading && <LoadingSvg size={17} />}
-          Сменить пароль
-        </div>
-      </button>
-    </form>
+      <FormButton
+        isLoading={isLoading}
+        text="Сменить пароль"
+      />
+    </Form>
   );
 }
 
 function SendMail() {
   const [formState, setFormState] = useState({ email: "" });
-  const [loading, setLoading] = useState(false);
+  const { call, isLoading } = useGetMailRequest(
+    formState,
+    () => toast.success("Письмо отправлено"),
+    error => toast.error(error.message),
+  );
 
-  function onSubmit(event) {
+  function onSubmit(event: Event) {
     event.preventDefault();
-    get(RESET_PASSWORD_URL.SEND_MAIL(encodeURI(formState.email)), false)
-      .then(() => setLoading(true))
-      .then(() => toast.success("Письмо отправлено"))
-      .catch(error => displayError(error))
-      .then(() => setLoading(false));
+    call();
   }
 
   return (
-    <form class="flex flex-col gap-1" onSubmit={onSubmit}>
-      <input
-        class="w-full bg-nord2 hover:bg-nord3 focus:bg-nord3 rounded p-0.5 px-2 outline-none placeholder:text-nord9"
-        type="email"
-        required
-        placeholder="email"
-        autocomplete="email"
+    <Form onSubmit={onSubmit}>
+      <FormInput
         value={formState.email}
-        onInput={(e) => setFormState({ ...formState, email: e.target.value })}
+        onInput={t => setFormState({ ...formState, email: t.value })}
+        placeholder="email" autocomplete type="email"
       />
-      <button type="submit" class="w-full mt-1 bg-nord2 hover:bg-nord3 rounded p-0.5">
-        <div class="flex flex-row justify-center m-auto">
-          {loading && <LoadingSvg size={17} />}
-          Отправить Письмо
-        </div>
-      </button>
-    </form>
+      <FormButton
+        isLoading={isLoading}
+        text="Отправить письмо"
+      />
+    </Form>
   );
 }
