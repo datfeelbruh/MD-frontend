@@ -1,5 +1,4 @@
 import useMovieSearchRequest from "@api/movie/movieSearchRequest";
-import NothingFinded from "@components/atomic/NothingFinded";
 import Paginator from "@components/atomic/Paginator";
 import ExpandedMovieCard from "@components/movieCards/ExpandedMovieCard";
 import Error from "@pages/Error";
